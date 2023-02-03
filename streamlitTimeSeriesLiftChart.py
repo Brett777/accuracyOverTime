@@ -64,12 +64,14 @@ def liftChart():
         URL = st.text_area(label="Paste a DataRobot Leaderboard URL")
         submit_button = st.form_submit_button()
 
-    dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
-    st.header("Accuracy Over Time and Lift Charts")
-    st.write("To get started, paste a leaderboard URL and click submit.")
 
     try:
-        #Get the model
+        # Title
+        st.header("Accuracy Over Time and Lift Charts")
+        st.write("This app allows you to quickly get to the details behind the DataRobot lift charts.")
+
+        #Connect to DataRobot, get the model
+        dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
         projectid = URL.split("projects/")
         projectid = projectid[1][:24]
         modelid = URL.split("models/")
