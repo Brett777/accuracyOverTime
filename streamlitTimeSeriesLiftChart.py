@@ -61,7 +61,7 @@ def introPage():
 def liftChart():
     with st.sidebar.form(key="form1"):
         API_KEY = st.text_input(label="DataRobot API Key")
-        URL = st.text_area(label="Paste a DataRobot Leaderboard URL")
+        URL = st.text_area(label="Paste a Time Series Model URL from the DataRobot leaderboard.")
         submit_button = st.form_submit_button()
 
 
