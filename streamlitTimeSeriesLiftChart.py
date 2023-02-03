@@ -63,7 +63,7 @@ def liftChart():
         API_KEY = st.text_input(label="DataRobot API Key")
         URL = st.text_area(label="Paste a Time Series Model URL from the DataRobot leaderboard.")
         submit_button = st.form_submit_button()
-    st.write(submit_button)
+
     if submit_button:
         try:
             # Title
@@ -76,11 +76,10 @@ def liftChart():
             projectid = projectid[1][:24]
             modelid = URL.split("models/")
             modelid = modelid[1][:24]
-            st.write(projectid)
-            st.write(modelid)
             project = dr.Project.get(project_id=projectid)
             model = dr.Model.get(project=project, model_id=modelid)
             datasetid = project.get_dataset().id
+            st.subheader(model.model_type)
         except Exception as e:
             st.write(e)
 
