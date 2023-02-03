@@ -63,7 +63,7 @@ def liftChart():
         API_KEY = st.text_input(label="DataRobot API Key")
         URL = st.text_area(label="Paste a Time Series Model URL from the DataRobot leaderboard.")
         submit_button = st.form_submit_button()
-
+    st.write(submit_button)
     if submit_button:
         try:
             # Title
