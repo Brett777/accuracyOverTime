@@ -226,8 +226,8 @@ def liftChart():
             st.dataframe(data4r.sort_values("prediction"), use_container_width=True)
             st.subheader("Then grouped into equally sized bins. The lift chart plots the mean values of predictions and actuals for each bin.")
             st.dataframe(data4, use_container_width=True)
-    except Exception as e:
-        st.write(e)
+    except:
+        pass
 
 #Second page
 def page2():
