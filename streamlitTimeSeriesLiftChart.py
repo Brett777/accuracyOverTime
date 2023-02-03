@@ -68,7 +68,7 @@ def liftChart():
     try:
         # Title
         st.header("Accuracy Over Time and Lift Charts")
-        st.write("This app allows you to quickly get to the details behind the DataRobot lift charts.")
+        st.write("Quickly get to the details behind DataRobot lift charts.")
 
         #Connect to DataRobot, get the model
         dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
