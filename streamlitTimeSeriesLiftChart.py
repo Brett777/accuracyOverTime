@@ -86,7 +86,7 @@ def liftChart():
         with st.spinner("Processing..."):
             data = getStackedPredictions(project,model,datasetid)
     except Exception as e:
-    write(e)
+        write(e)
 
     try:
         data["partition_id"] = data["partition_id"].str.replace(".0","")
