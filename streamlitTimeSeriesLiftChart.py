@@ -86,7 +86,10 @@ def liftChart():
         # Get the predictions
         with st.spinner("Processing..."):
             data = getStackedPredictions(project,model,datasetid)
+    except:
+        pass
 
+    try:
         data["partition_id"] = data["partition_id"].str.replace(".0","")
         selected_series = st.selectbox(label="Choose a series", options=project.get_multiseries_names())
 
