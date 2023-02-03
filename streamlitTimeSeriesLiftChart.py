@@ -63,11 +63,12 @@ def liftChart():
         API_KEY = st.text_input(label="DataRobot API Key")
         URL = st.text_area(label="Paste a DataRobot Leaderboard URL")
         submit_button = st.form_submit_button()
-    try:
-        dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
-        st.header("Accuracy Over Time and Lift Charts")
-        st.write("To get started, paste a leaderboard URL and click submit.")
 
+    dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
+    st.header("Accuracy Over Time and Lift Charts")
+    st.write("To get started, paste a leaderboard URL and click submit.")
+
+    try:
         #Get the model
         projectid = URL.split("projects/")
         projectid = projectid[1][:24]
@@ -76,7 +77,10 @@ def liftChart():
         project = dr.Project.get(project_id=projectid)
         model = dr.Model.get(project=project, model_id=modelid)
         datasetid = project.get_dataset().id
+    except:
+        pass
 
+    try:
         # Get the predictions
         with st.spinner("Processing..."):
             data = getStackedPredictions(project,model,datasetid)
