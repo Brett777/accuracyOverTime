@@ -1,5 +1,5 @@
-requests
-pandas
-datarobot
-PIL
-plotly
+requests==2.28.1
+pandas==1.5.1
+datarobot==3.0.2
+Pillow==9.3.0
+plotly==5.11.0
