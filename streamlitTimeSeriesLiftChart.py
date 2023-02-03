@@ -64,7 +64,6 @@ def liftChart():
         URL = st.text_area(label="Paste a Time Series Model URL from the DataRobot leaderboard.")
         submit_button = st.form_submit_button()
 
-
     try:
         # Title
         st.header("Accuracy Over Time and Lift Charts")
@@ -79,15 +78,15 @@ def liftChart():
         project = dr.Project.get(project_id=projectid)
         model = dr.Model.get(project=project, model_id=modelid)
         datasetid = project.get_dataset().id
-    except:
-        pass
+    except Exception as e:
+        write(e)
 
     try:
         # Get the predictions
         with st.spinner("Processing..."):
             data = getStackedPredictions(project,model,datasetid)
-    except:
-        pass
+    except Exception as e:
+    write(e)
 
     try:
         data["partition_id"] = data["partition_id"].str.replace(".0","")
