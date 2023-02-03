@@ -79,7 +79,7 @@ def liftChart():
         model = dr.Model.get(project=project, model_id=modelid)
         datasetid = project.get_dataset().id
     except Exception as e:
-        write(e)
+        st.write(e)
 
     try:
         # Get the predictions
