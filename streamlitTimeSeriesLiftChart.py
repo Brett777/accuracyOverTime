@@ -76,6 +76,8 @@ def liftChart():
             projectid = projectid[1][:24]
             modelid = URL.split("models/")
             modelid = modelid[1][:24]
+            st.write(projectid)
+            st.write(modelid)
             project = dr.Project.get(project_id=projectid)
             model = dr.Model.get(project=project, model_id=modelid)
             datasetid = project.get_dataset().id
