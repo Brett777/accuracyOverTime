@@ -1,0 +1,5 @@
+requests
+pandas
+datarobot
+PIL
+plotly
