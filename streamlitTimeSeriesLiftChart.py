@@ -66,9 +66,6 @@ def liftChart():
 
     if submit_button:
         try:
-            # Title
-            st.header("Accuracy Over Time and Lift Charts")
-            st.write("Quickly get to the details behind DataRobot lift charts.")
 
             #Connect to DataRobot, get the model
             dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
