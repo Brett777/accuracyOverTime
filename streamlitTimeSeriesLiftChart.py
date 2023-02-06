@@ -5,7 +5,7 @@ import datarobot as dr
 from PIL import Image
 import plotly.express as px
 import plotly.graph_objects as go
-
+import os
 #Configure the page title, favicon, layout, etc
 st.set_page_config(page_title="Time Series Lift Chart",
                    page_icon=":chart:",
@@ -60,7 +60,7 @@ def introPage():
 #First page
 def liftChart():
     with st.sidebar.form(key="form1"):
-        API_KEY = st.text_input(label="DataRobot API Key")
+        API_KEY = st.text_input(label="DataRobot API Key", value=os.environ.get('DATAROBOT_API_TOKEN'))
         URL = st.text_area(label="Paste a Time Series Model URL from the DataRobot leaderboard.")
         submit_button = st.form_submit_button()
 
