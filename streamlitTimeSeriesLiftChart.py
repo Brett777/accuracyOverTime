@@ -64,168 +64,168 @@ def liftChart():
         URL = st.text_area(label="Paste a Time Series Model URL from the DataRobot leaderboard.")
         submit_button = st.form_submit_button()
 
-    if submit_button:
-        try:
 
-            #Connect to DataRobot, get the model
-            dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
-            projectid = URL.split("projects/")
-            projectid = projectid[1][:24]
-            modelid = URL.split("models/")
-            modelid = modelid[1][:24]
-            project = dr.Project.get(project_id=projectid)
-            model = dr.Model.get(project=project, model_id=modelid)
-            datasetid = project.get_dataset().id
-            st.subheader(model.model_type)
-        except Exception as e:
-            st.write(e)
+    try:
 
-        try:
-            # Get the predictions
-            with st.spinner("Processing..."):
-                data = getStackedPredictions(project,model,datasetid)
-        except Exception as e:
-            st.write(e)
+        #Connect to DataRobot, get the model
+        dr.Client(token=API_KEY, endpoint='https://app.datarobot.com/api/v2')
+        projectid = URL.split("projects/")
+        projectid = projectid[1][:24]
+        modelid = URL.split("models/")
+        modelid = modelid[1][:24]
+        project = dr.Project.get(project_id=projectid)
+        model = dr.Model.get(project=project, model_id=modelid)
+        datasetid = project.get_dataset().id
+        st.subheader(model.model_type)
+    except Exception as e:
+        st.write(e)
 
-        try:
-            data["partition_id"] = data["partition_id"].str.replace(".0","")
-            selected_series = st.selectbox(label="Choose a series", options=project.get_multiseries_names())
+    try:
+        # Get the predictions
+        with st.spinner("Processing..."):
+            data = getStackedPredictions(project,model,datasetid)
+    except Exception as e:
+        st.write(e)
 
-            #Accuracy Over Time Plot for the selected series
-            data1 = data.loc[(data["series_id"]==selected_series) & (data["forecast_distance"] == 1)].copy()
-            fig1 = px.line(title="Accuracy over Time for " + selected_series + " All Backtests, Forecast Distance +1")
-            fig1.add_trace(go.Scatter(
-                x=data1["timestamp"],
-                y=data1[project.target.replace(" (actual)","")],
-                mode="lines",
-                yhoverformat=",.2f",
-                name=project.target,
-                line_shape="spline",
-                line=dict(color="#ffbd00", width=2)
-            ))
-            fig1.add_trace(go.Scatter(
-                x=data1[dr.DatetimePartitioning.get(project.id).datetime_partition_column.replace(" (actual)","")],
-                y=data1["prediction"],
-                mode="lines",
-                yhoverformat=",.2f",
-                name="Prediction",
-                line_shape="spline",
-                line=dict(color="#1d3557", width=2)
-            ))
-            fig1.update_layout(hovermode="x unified")
-            st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
+    try:
+        data["partition_id"] = data["partition_id"].str.replace(".0","")
+        selected_series = st.selectbox(label="Choose a series", options=project.get_multiseries_names())
+
+        #Accuracy Over Time Plot for the selected series
+        data1 = data.loc[(data["series_id"]==selected_series) & (data["forecast_distance"] == 1)].copy()
+        fig1 = px.line(title="Accuracy over Time for " + selected_series + " All Backtests, Forecast Distance +1")
+        fig1.add_trace(go.Scatter(
+            x=data1["timestamp"],
+            y=data1[project.target.replace(" (actual)","")],
+            mode="lines",
+            yhoverformat=",.2f",
+            name=project.target,
+            line_shape="spline",
+            line=dict(color="#ffbd00", width=2)
+        ))
+        fig1.add_trace(go.Scatter(
+            x=data1[dr.DatetimePartitioning.get(project.id).datetime_partition_column.replace(" (actual)","")],
+            y=data1["prediction"],
+            mode="lines",
+            yhoverformat=",.2f",
+            name="Prediction",
+            line_shape="spline",
+            line=dict(color="#1d3557", width=2)
+        ))
+        fig1.update_layout(hovermode="x unified")
+        st.plotly_chart(fig1, theme="streamlit", use_container_width=True)
 
 
-            #Lift Chart for all points, selected series
-            data2 = data1.copy()
-            data2.sort_values("prediction", inplace=True)
-            data2.reset_index(drop=True, inplace=True)
-            fig2 = px.line(title="Lift Chart (Not Binned) for " + selected_series + " All Backtests, Forecast Distance +1")
-            fig2.add_trace(go.Scatter(
-                x=data2.index,
-                y=data2[project.target.replace(" (actual)", "")],
-                mode="lines",
-                yhoverformat=",.2f",
-                name=project.target,
-                line_shape="spline",
-                line=dict(color="#ffbd00", width=2)
-            ))
-            fig2.add_trace(go.Scatter(
-                x=data2.index,
-                y=data2["prediction"],
-                mode="lines",
-                yhoverformat=",.2f",
-                name="Prediction",
-                line_shape="spline",
-                line=dict(color="#1d3557", width=2)
-            ))
-            fig2.update_layout(hovermode="x unified")
-            st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
+        #Lift Chart for all points, selected series
+        data2 = data1.copy()
+        data2.sort_values("prediction", inplace=True)
+        data2.reset_index(drop=True, inplace=True)
+        fig2 = px.line(title="Lift Chart (Not Binned) for " + selected_series + " All Backtests, Forecast Distance +1")
+        fig2.add_trace(go.Scatter(
+            x=data2.index,
+            y=data2[project.target.replace(" (actual)", "")],
+            mode="lines",
+            yhoverformat=",.2f",
+            name=project.target,
+            line_shape="spline",
+            line=dict(color="#ffbd00", width=2)
+        ))
+        fig2.add_trace(go.Scatter(
+            x=data2.index,
+            y=data2["prediction"],
+            mode="lines",
+            yhoverformat=",.2f",
+            name="Prediction",
+            line_shape="spline",
+            line=dict(color="#1d3557", width=2)
+        ))
+        fig2.update_layout(hovermode="x unified")
+        st.plotly_chart(fig2, theme="streamlit", use_container_width=True)
 
-            #Binned Lift chart settings
-            st.subheader("Binned Lift Charts All Forecast Distances")
-            st.write("These charts are just like the lift charts in DataRobot. Click the expander to see the full table of values below. ")
-            bins = st.number_input(label="Number of Bins", value=10, min_value=5, max_value=100)
-            backtest_options = list(range(0,dr.DatetimePartitioning.get(project.id).number_of_backtests))
-            if dr.DatetimePartitioning.get(project.id).disable_holdout == False:
-                backtest_options.append("Holdout")
-            backtest = st.selectbox(label="Choose a Backtest", options=backtest_options)
+        #Binned Lift chart settings
+        st.subheader("Binned Lift Charts All Forecast Distances")
+        st.write("These charts are just like the lift charts in DataRobot. Click the expander to see the full table of values below. ")
+        bins = st.number_input(label="Number of Bins", value=10, min_value=5, max_value=100)
+        backtest_options = list(range(0,dr.DatetimePartitioning.get(project.id).number_of_backtests))
+        if dr.DatetimePartitioning.get(project.id).disable_holdout == False:
+            backtest_options.append("Holdout")
+        backtest = st.selectbox(label="Choose a Backtest", options=backtest_options)
 
-            #Lift Chart Binned Selected Series and Backtest
-            data3 = data.loc[(data["series_id"]==selected_series)].copy()
-            data3 = data3.loc[data3["partition_id"] == str(backtest)]
-            data3["rank"] = data3["prediction"].rank(method="first")
-            data3["Bin"] = pd.qcut(data3["rank"], q=bins, labels=False)
-            data3r = data3.copy()
-            data3 = data3[["partition_id","Bin", "prediction",project.target.replace(" (actual)", "")]].groupby(["partition_id","Bin"]).agg(['mean','count']).reset_index(drop=False)
-            data3.columns = data3.columns.to_flat_index()
-            data3.columns = ["Backtest","Bin","Prediction Mean","Prediction Count",project.target.replace(" (actual)","")+" Mean","Rows in Bin"]
+        #Lift Chart Binned Selected Series and Backtest
+        data3 = data.loc[(data["series_id"]==selected_series)].copy()
+        data3 = data3.loc[data3["partition_id"] == str(backtest)]
+        data3["rank"] = data3["prediction"].rank(method="first")
+        data3["Bin"] = pd.qcut(data3["rank"], q=bins, labels=False)
+        data3r = data3.copy()
+        data3 = data3[["partition_id","Bin", "prediction",project.target.replace(" (actual)", "")]].groupby(["partition_id","Bin"]).agg(['mean','count']).reset_index(drop=False)
+        data3.columns = data3.columns.to_flat_index()
+        data3.columns = ["Backtest","Bin","Prediction Mean","Prediction Count",project.target.replace(" (actual)","")+" Mean","Rows in Bin"]
 
-            fig3 = px.line(title="Lift Chart Binned for " + selected_series, hover_data=[data3["Rows in Bin"]])
-            fig3.add_trace(go.Scatter(
-                x=data3["Bin"],
-                y=data3[project.target.replace(" (actual)","")+" Mean"],
-                mode="lines+markers",
-                yhoverformat=",.2f",
-                name=project.target,
-                line_shape="spline",
-                line=dict(color="#ffbd00", width=2)
-            ))
-            fig3.add_trace(go.Scatter(
-                x=data3["Bin"],
-                y=data3["Prediction Mean"],
-                mode="lines+markers",
-                yhoverformat=",.2f",
-                name="Prediction",
-                line_shape="spline",
-                line=dict(color="#1d3557", width=2)
-            ))
-            fig3.update_layout(hovermode="x unified")
-            st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
-            with st.expander("See data"):
-                st.subheader("Predictions are sorted from lowest to highest.")
-                st.dataframe(data3r.sort_values("prediction"), use_container_width=True)
-                st.subheader("Then grouped into equally sized bins. The lift chart plots the mean values of predictions and actuals for each bin.")
-                st.dataframe(data3, use_container_width=True)
+        fig3 = px.line(title="Lift Chart Binned for " + selected_series, hover_data=[data3["Rows in Bin"]])
+        fig3.add_trace(go.Scatter(
+            x=data3["Bin"],
+            y=data3[project.target.replace(" (actual)","")+" Mean"],
+            mode="lines+markers",
+            yhoverformat=",.2f",
+            name=project.target,
+            line_shape="spline",
+            line=dict(color="#ffbd00", width=2)
+        ))
+        fig3.add_trace(go.Scatter(
+            x=data3["Bin"],
+            y=data3["Prediction Mean"],
+            mode="lines+markers",
+            yhoverformat=",.2f",
+            name="Prediction",
+            line_shape="spline",
+            line=dict(color="#1d3557", width=2)
+        ))
+        fig3.update_layout(hovermode="x unified")
+        st.plotly_chart(fig3, theme="streamlit", use_container_width=True)
+        with st.expander("See data"):
+            st.subheader("Predictions are sorted from lowest to highest.")
+            st.dataframe(data3r.sort_values("prediction"), use_container_width=True)
+            st.subheader("Then grouped into equally sized bins. The lift chart plots the mean values of predictions and actuals for each bin.")
+            st.dataframe(data3, use_container_width=True)
 
-            # Lift Chart Binned All Series and Selected Backtest
-            data4 = data.copy()
-            data4 = data4.loc[data4["partition_id"] == str(backtest)]
-            data4["rank"] = data["prediction"].rank(method="first")
-            data4["Bin"] = pd.qcut(data4["rank"], q=bins, labels=False)
-            data4r = data4.copy()
-            data4 = data4[["partition_id","Bin", "prediction", project.target.replace(" (actual)", "")]].groupby(["partition_id","Bin"]).agg(['mean', 'count']).reset_index(drop=False)
-            data4.columns = data4.columns.to_flat_index()
-            data4.columns = ["Backtest","Bin", "Prediction Mean", "Prediction Count", project.target.replace(" (actual)", "") + " Mean", "Rows in Bin"]
+        # Lift Chart Binned All Series and Selected Backtest
+        data4 = data.copy()
+        data4 = data4.loc[data4["partition_id"] == str(backtest)]
+        data4["rank"] = data["prediction"].rank(method="first")
+        data4["Bin"] = pd.qcut(data4["rank"], q=bins, labels=False)
+        data4r = data4.copy()
+        data4 = data4[["partition_id","Bin", "prediction", project.target.replace(" (actual)", "")]].groupby(["partition_id","Bin"]).agg(['mean', 'count']).reset_index(drop=False)
+        data4.columns = data4.columns.to_flat_index()
+        data4.columns = ["Backtest","Bin", "Prediction Mean", "Prediction Count", project.target.replace(" (actual)", "") + " Mean", "Rows in Bin"]
 
-            fig4 = px.line(title="Lift Chart Binned for all Series")
-            fig4.add_trace(go.Scatter(
-                x=data4["Bin"],
-                y=data4[project.target.replace(" (actual)", "") + " Mean"],
-                mode="lines+markers",
-                yhoverformat=",.2f",
-                name=project.target,
-                line_shape="spline",
-                line=dict(color="#ffbd00", width=2)
-            ))
-            fig4.add_trace(go.Scatter(
-                x=data4["Bin"],
-                y=data4["Prediction Mean"],
-                mode="lines+markers",
-                yhoverformat=",.2f",
-                name="Prediction",
-                line_shape="spline",
-                line=dict(color="#1d3557", width=2)
-            ))
-            fig4.update_layout(hovermode="x unified")
-            st.plotly_chart(fig4, theme="streamlit", use_container_width=True)
-            with st.expander("See data"):
-                st.subheader("Predictions are sorted from lowest to highest.")
-                st.dataframe(data4r.sort_values("prediction"), use_container_width=True)
-                st.subheader("Then grouped into equally sized bins. The lift chart plots the mean values of predictions and actuals for each bin.")
-                st.dataframe(data4, use_container_width=True)
-        except Exception as e:
-            st.write(e)
+        fig4 = px.line(title="Lift Chart Binned for all Series")
+        fig4.add_trace(go.Scatter(
+            x=data4["Bin"],
+            y=data4[project.target.replace(" (actual)", "") + " Mean"],
+            mode="lines+markers",
+            yhoverformat=",.2f",
+            name=project.target,
+            line_shape="spline",
+            line=dict(color="#ffbd00", width=2)
+        ))
+        fig4.add_trace(go.Scatter(
+            x=data4["Bin"],
+            y=data4["Prediction Mean"],
+            mode="lines+markers",
+            yhoverformat=",.2f",
+            name="Prediction",
+            line_shape="spline",
+            line=dict(color="#1d3557", width=2)
+        ))
+        fig4.update_layout(hovermode="x unified")
+        st.plotly_chart(fig4, theme="streamlit", use_container_width=True)
+        with st.expander("See data"):
+            st.subheader("Predictions are sorted from lowest to highest.")
+            st.dataframe(data4r.sort_values("prediction"), use_container_width=True)
+            st.subheader("Then grouped into equally sized bins. The lift chart plots the mean values of predictions and actuals for each bin.")
+            st.dataframe(data4, use_container_width=True)
+    except Exception as e:
+        st.write(e)
 
 #Second page
 def page2():
